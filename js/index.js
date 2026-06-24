@@ -17,14 +17,39 @@ async function fetchWeather(location) {
     return null;
   }
 }
-async function handleSearch() {
-  const data = await fetchWeather('kkkkkfffhhhhf');
+async function handleSearch(location) {
+  const data = await fetchWeather(location);
 
-  if (!data) {
-    console.log('Show error to user: Could not fetch weather.');
-    return;
-  }
+  // if (!data) {
+  //   console.log('Show error to user: Could not fetch weather.');
+  //   return;
+  // }
 
   console.log('Success! Data received:', data);
+  const processed = processWeatherData(data);
+  console.log('Processed:', processed);
 }
-handleSearch();
+
+//Raw Data
+function processWeatherData(rawData) {
+  const tempC = rawData.currentConditions.temp;
+
+  return {
+    location: rawData.resolvedAddress,
+    tempC: Math.round(tempC),
+    tempF: Math.round((tempC * 9) / 5 + 32),
+    condition: rawData.currentConditions.conditions,
+    icon: rawData.currentConditions.icon,
+  };
+}
+
+const weatherForm = document.querySelector('form');
+const locationInput = document.getElementById('location-input');
+
+weatherForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+
+  const cityName = locationInput.value;
+  handleSearch(cityName);
+  console.log('Form submitted! Searching weather for:', cityName);
+});
