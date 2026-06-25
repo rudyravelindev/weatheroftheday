@@ -31,20 +31,29 @@ let lastWeatherData = null;
 let currentUnit = 'C';
 
 async function handleSearch(location) {
-  const data = await fetchWeather(location);
+  loadingIndicator.style.display = 'block';
 
-  if (!data) {
-    console.log('Show error to user: Could not fetch weather.');
-    weatherResults.innerHTML = `<p>Could not find that location. Try again.</p>`;
+  try {
+    const data = await fetchWeather(location);
 
-    return;
+    if (!data) {
+      console.log('Show error to user: Could not fetch weather.');
+      weatherResults.innerHTML = `
+  <div class="weather-card">
+    <p>Could not find that location. Try again.</p>
+  </div>
+`;
+      return;
+    }
+
+    console.log('Success! Data received:', data);
+    const processed = processWeatherData(data);
+    lastWeatherData = processed;
+    console.log('Processed:', processed);
+    renderWeather(processed);
+  } finally {
+    loadingIndicator.style.display = 'none';
   }
-
-  console.log('Success! Data received:', data);
-  const processed = processWeatherData(data);
-  lastWeatherData = processed;
-  console.log('Processed:', processed);
-  renderWeather(processed);
 }
 
 //Raw Data
@@ -63,6 +72,7 @@ function processWeatherData(rawData) {
 const weatherForm = document.querySelector('form');
 const locationInput = document.getElementById('location-input');
 const weatherResults = document.getElementById('weather-results');
+const loadingIndicator = document.getElementById('loading');
 
 weatherForm.addEventListener('submit', function (event) {
   event.preventDefault();
@@ -87,8 +97,11 @@ function renderWeather(processed) {
   document.body.className = weatherClass;
 
   weatherResults.innerHTML = `
-    <h2>${processed.location}</h2>
-<p>${displayTemp}°${displayUnit}</p>    <p>${processed.condition}</p>
+    <div class="weather-card">
+      <h2>${processed.location}</h2>
+      <p>${displayTemp}°${displayUnit}</p>
+      <p>${processed.condition}</p>
+    </div>
   `;
 }
 
