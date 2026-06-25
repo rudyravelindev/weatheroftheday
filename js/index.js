@@ -20,14 +20,17 @@ async function fetchWeather(location) {
 async function handleSearch(location) {
   const data = await fetchWeather(location);
 
-  // if (!data) {
-  //   console.log('Show error to user: Could not fetch weather.');
-  //   return;
-  // }
+  if (!data) {
+    console.log('Show error to user: Could not fetch weather.');
+    weatherResults.innerHTML = `<p>Could not find that location. Try again.</p>`;
+
+    return;
+  }
 
   console.log('Success! Data received:', data);
   const processed = processWeatherData(data);
   console.log('Processed:', processed);
+  renderWeather(processed);
 }
 
 //Raw Data
@@ -45,6 +48,7 @@ function processWeatherData(rawData) {
 
 const weatherForm = document.querySelector('form');
 const locationInput = document.getElementById('location-input');
+const weatherResults = document.getElementById('weather-results');
 
 weatherForm.addEventListener('submit', function (event) {
   event.preventDefault();
@@ -53,3 +57,11 @@ weatherForm.addEventListener('submit', function (event) {
   handleSearch(cityName);
   console.log('Form submitted! Searching weather for:', cityName);
 });
+
+function renderWeather(processed) {
+  weatherResults.innerHTML = `
+    <h2>${processed.location}</h2>
+     <p>${processed.tempC}°C / ${processed.tempF}°F</p>
+    <p>${processed.condition}</p>
+  `;
+}
