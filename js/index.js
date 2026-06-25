@@ -1,3 +1,12 @@
+const weatherClassMap = {
+  'clear-day': 'weather-clear',
+  'clear-night': 'weather-clear',
+  rain: 'weather-rain',
+  snow: 'weather-snow',
+  cloudy: 'weather-cloudy',
+  'partly-cloudy-day': 'weather-cloudy',
+  'partly-cloudy-night': 'weather-cloudy',
+};
 const API_KEY = 'Q9UJ5BRFLRUAW7G98F3XTAME3';
 async function fetchWeather(location) {
   const requestUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(location)}?unitGroup=metric&key=${API_KEY}&contentType=json`;
@@ -74,6 +83,8 @@ function renderWeather(processed) {
     displayTemp = processed.tempF;
     displayUnit = 'F';
   }
+  const weatherClass = weatherClassMap[processed.icon] || 'weather-default';
+  document.body.className = weatherClass;
 
   weatherResults.innerHTML = `
     <h2>${processed.location}</h2>
