@@ -17,6 +17,10 @@ async function fetchWeather(location) {
     return null;
   }
 }
+
+let lastWeatherData = null;
+let currentUnit = 'C';
+
 async function handleSearch(location) {
   const data = await fetchWeather(location);
 
@@ -29,6 +33,7 @@ async function handleSearch(location) {
 
   console.log('Success! Data received:', data);
   const processed = processWeatherData(data);
+  lastWeatherData = processed;
   console.log('Processed:', processed);
   renderWeather(processed);
 }
@@ -59,9 +64,32 @@ weatherForm.addEventListener('submit', function (event) {
 });
 
 function renderWeather(processed) {
+  let displayTemp;
+  let displayUnit;
+
+  if (currentUnit === 'C') {
+    displayTemp = processed.tempC;
+    displayUnit = 'C';
+  } else {
+    displayTemp = processed.tempF;
+    displayUnit = 'F';
+  }
+
   weatherResults.innerHTML = `
     <h2>${processed.location}</h2>
-     <p>${processed.tempC}°C / ${processed.tempF}°F</p>
-    <p>${processed.condition}</p>
+<p>${displayTemp}°${displayUnit}</p>    <p>${processed.condition}</p>
   `;
 }
+
+const unitToggle = document.getElementById('unit-toggle');
+
+unitToggle.addEventListener('click', function () {
+  if (currentUnit === 'C') {
+    currentUnit = 'F';
+  } else {
+    currentUnit = 'C';
+  }
+  if (lastWeatherData) {
+    renderWeather(lastWeatherData);
+  }
+});
